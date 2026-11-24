@@ -1,521 +1,372 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <base target="_top">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
+  <meta name="theme-color" content="#173b31">
+  <title>Centralce · Mosteiro da Santa Cruz</title>
   <style>
     :root {
-      --fundo: #f5f2eb;
-      --papel: #fffefa;
-      --texto: #302e29;
-      --suave: #77736b;
-      --linha: #e5e0d6;
-      --verde: #465b49;
-      --verde-claro: #e8eee7;
-      --ouro: #a18450;
+      color-scheme: light;
+      --forest: #173b31;
+      --forest-2: #21483b;
+      --forest-3: #2e5a49;
+      --gold: #c4a66a;
+      --page: #f4f6f3;
+      --surface: #ffffff;
+      --surface-soft: #edf2ed;
+      --ink: #202b25;
+      --muted: #77837b;
+      --line: #e1e8e1;
+      --shadow: 0 8px 28px rgba(22, 50, 39, .07);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
-    * {
-      box-sizing: border-box;
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body { background: var(--page); color: var(--ink); }
+    button { font: inherit; }
+    .app { min-height: 100vh; display: grid; grid-template-columns: 256px minmax(0, 1fr); }
+
+    .sidebar {
+      position: sticky; top: 0; height: 100vh; min-height: 560px;
+      display: flex; flex-direction: column; padding: 25px 17px 18px;
+      color: #f3f6f1; background: var(--forest);
     }
-
-    body {
-      margin: 0;
-      background: var(--fundo);
-      color: var(--texto);
-      font-family: Georgia, serif;
+    .brand { display: flex; align-items: center; gap: 12px; padding: 2px 10px 28px; }
+    .brand-mark {
+      width: 40px; height: 40px; display: grid; place-items: center;
+      border: 1px solid rgba(196,166,106,.6); border-radius: 13px;
+      color: var(--gold); font-family: Georgia, serif; font-size: 25px;
     }
+    .brand-name { font-family: Georgia, serif; font-size: 21px; letter-spacing: .3px; }
+    .brand-sub { margin-top: 3px; color: #b9c9be; font-size: 9px; letter-spacing: 1.55px; text-transform: uppercase; }
 
-    header {
-      background: var(--papel);
-      border-bottom: 1px solid var(--linha);
-      padding: 30px 24px 24px;
-      text-align: center;
+    .nav-label { padding: 10px 11px 9px; color: #91a99a; font-size: 10px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; }
+    .nav { display: grid; gap: 5px; }
+    .nav-button {
+      width: 100%; min-height: 45px; display: flex; align-items: center; gap: 12px;
+      padding: 0 12px; border: 1px solid transparent; border-radius: 9px;
+      color: #d4dfd6; background: transparent; text-align: left; cursor: pointer;
+      transition: background .16s ease, color .16s ease, border-color .16s ease;
     }
+    .nav-button:hover { background: rgba(255,255,255,.07); color: #fff; }
+    .nav-button.active { color: #fff; background: var(--forest-3); border-color: rgba(255,255,255,.08); }
+    .nav-icon { width: 21px; text-align: center; color: #c7b17e; font-size: 17px; }
+    .nav-text { flex: 1; font-size: 13px; font-weight: 550; }
+    .nav-tag { color: #a8b8ac; font-size: 9px; }
+    .sidebar-spacer { flex: 1; }
+    .sidebar-note { margin: 15px 4px 0; padding: 14px 12px; border: 1px solid rgba(255,255,255,.12); border-radius: 10px; color: #c1d0c5; font-size: 11px; line-height: 1.55; }
+    .sidebar-note strong { display: block; margin-bottom: 4px; color: #f0e6cf; font-size: 11px; }
+    .sidebar-footer { padding: 18px 10px 0; color: #8fa497; font-size: 10px; }
 
-    header .marca {
-      color: var(--ouro);
-      font-size: 27px;
-      margin-bottom: 8px;
+    .workspace { min-width: 0; min-height: 100vh; display: flex; flex-direction: column; }
+    .topbar {
+      min-height: 72px; display: flex; align-items: center; justify-content: space-between;
+      gap: 18px; padding: 0 34px; background: rgba(255,255,255,.88);
+      border-bottom: 1px solid var(--line);
     }
+    .crumb { color: var(--muted); font-size: 12px; }
+    .crumb strong { color: var(--ink); font-weight: 650; }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+    .system-status { display: inline-flex; align-items: center; gap: 7px; color: #64766a; font-size: 11px; }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #6e9a75; box-shadow: 0 0 0 3px #e7f0e6; }
+    .avatar { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; color: var(--forest); background: #e8eee7; font-family: Georgia, serif; font-size: 15px; }
 
-    h1 {
-      font-size: 27px;
-      font-weight: normal;
-      margin: 0;
+    .content { width: min(1440px, 100%); flex: 1; margin: 0 auto; padding: 34px; }
+    .page-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; margin-bottom: 27px; }
+    .eyebrow { margin-bottom: 8px; color: #8a7953; font-size: 10px; font-weight: 750; letter-spacing: 1.6px; text-transform: uppercase; }
+    h1 { margin: 0; color: #1e3027; font-family: Georgia, serif; font-size: clamp(27px, 3vw, 36px); font-weight: 400; letter-spacing: -.5px; }
+    .lead { margin: 9px 0 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .date-label { color: var(--muted); font-size: 11px; white-space: nowrap; }
+
+    .welcome {
+      position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between;
+      gap: 24px; min-height: 185px; margin-bottom: 25px; padding: 30px 34px;
+      border-radius: 15px; color: #f5f6ef; background: linear-gradient(112deg, #173b31 0%, #285342 72%, #365d48 100%);
+      box-shadow: var(--shadow);
     }
+    .welcome:after { content: "✥"; position: absolute; right: 36px; top: -43px; color: rgba(221,205,161,.13); font-family: Georgia, serif; font-size: 220px; line-height: 1; }
+    .welcome-copy { position: relative; z-index: 1; max-width: 590px; }
+    .welcome-kicker { color: #d4c08f; font-size: 10px; font-weight: 700; letter-spacing: 1.7px; text-transform: uppercase; }
+    .welcome h2 { margin: 10px 0 8px; font-family: Georgia, serif; font-size: clamp(22px, 3vw, 29px); font-weight: 400; }
+    .welcome p { max-width: 510px; margin: 0; color: #d1ded4; font-size: 12px; line-height: 1.7; }
+    .welcome-seal { position: relative; z-index: 1; width: 86px; height: 86px; flex: 0 0 86px; display: grid; place-items: center; border: 1px solid rgba(220,199,145,.45); border-radius: 50%; color: #d7c18d; font-family: Georgia, serif; font-size: 47px; }
 
-    header p {
-      color: var(--suave);
-      font-size: 11px;
-      letter-spacing: 2px;
-      margin: 10px 0 0;
+    .section-title { margin: 0 0 13px; color: #34483c; font-family: Georgia, serif; font-size: 18px; font-weight: 400; }
+    .module-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; }
+    .module-card {
+      min-height: 143px; display: flex; flex-direction: column; align-items: flex-start;
+      padding: 18px; border: 1px solid var(--line); border-radius: 12px;
+      background: var(--surface); text-align: left; cursor: pointer; box-shadow: 0 2px 9px rgba(22,50,39,.025);
+      transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
     }
+    .module-card:hover { transform: translateY(-2px); border-color: #c8d6c9; box-shadow: var(--shadow); }
+    .module-card:disabled { cursor: default; opacity: .76; }
+    .module-card:disabled:hover { transform: none; box-shadow: none; }
+    .module-top { width: 100%; display: flex; align-items: center; justify-content: space-between; }
+    .module-icon { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 10px; color: var(--forest-2); background: var(--surface-soft); font-size: 17px; }
+    .module-state { color: #7b8c7f; font-size: 9px; }
+    .module-card strong { margin-top: 15px; color: #293a30; font-size: 13px; font-weight: 650; }
+    .module-card small { margin-top: 5px; color: var(--muted); font-size: 11px; line-height: 1.5; }
 
-    main {
-      width: min(1050px, calc(100% - 32px));
-      margin: 30px auto 60px;
+    .module-view { display: none; min-height: calc(100vh - 145px); }
+    .module-view.visible { display: block; }
+    .module-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 15px; }
+    .back-button { padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; color: #4e6255; background: white; font-size: 11px; cursor: pointer; }
+    .module-frame-wrap { height: calc(100vh - 180px); min-height: 570px; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: white; box-shadow: var(--shadow); }
+    .module-frame { display: block; width: 100%; height: 100%; border: 0; background: #f5f2eb; }
+    .placeholder { max-width: 760px; margin: 42px auto; padding: 34px; border: 1px solid var(--line); border-radius: 14px; background: white; text-align: center; box-shadow: var(--shadow); }
+    .placeholder-icon { width: 58px; height: 58px; display: grid; place-items: center; margin: 0 auto 17px; border-radius: 17px; color: var(--forest-2); background: var(--surface-soft); font-size: 25px; }
+    .placeholder h2 { margin: 0; color: #293a30; font-family: Georgia, serif; font-size: 24px; font-weight: 400; }
+    .placeholder p { max-width: 520px; margin: 10px auto 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+    .placeholder-label { display: inline-block; margin-top: 19px; padding: 6px 10px; border-radius: 20px; color: #806b3f; background: #f5f0e4; font-size: 10px; }
+
+    @media (max-width: 1050px) {
+      .app { grid-template-columns: 220px minmax(0, 1fr); }
+      .module-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .content { padding: 27px 24px; }
+      .topbar { padding: 0 24px; }
     }
-
-    .indicadores {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      margin-bottom: 25px;
+    @media (max-width: 720px) {
+      .app { display: block; }
+      .sidebar { position: relative; z-index: 5; height: auto; min-height: 0; padding: 12px 13px 10px; }
+      .brand { padding: 0 5px 11px; }
+      .brand-mark { width: 34px; height: 34px; font-size: 21px; }
+      .brand-name { font-size: 18px; }
+      .brand-sub { font-size: 8px; }
+      .nav-label, .sidebar-note, .sidebar-footer, .sidebar-spacer { display: none; }
+      .nav { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: thin; }
+      .nav-button { width: auto; min-width: max-content; min-height: 38px; gap: 7px; padding: 0 10px; }
+      .nav-icon { width: auto; font-size: 14px; }
+      .nav-text { font-size: 11px; }
+      .nav-tag { display: none; }
+      .topbar { min-height: 51px; padding: 0 16px; }
+      .content { padding: 23px 15px; }
+      .page-heading { align-items: flex-start; flex-direction: column; gap: 7px; margin-bottom: 19px; }
+      .welcome { min-height: 165px; padding: 23px 21px; }
+      .welcome-seal { width: 56px; height: 56px; flex-basis: 56px; font-size: 31px; }
+      .module-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+      .module-card { min-height: 132px; padding: 13px; }
+      .module-card strong { margin-top: 12px; }
+      .module-frame-wrap { height: calc(100vh - 205px); min-height: 470px; }
+      .module-view { min-height: calc(100vh - 100px); }
+      .system-status { display: none; }
     }
-
-    .indicador {
-      background: var(--papel);
-      border: 1px solid var(--linha);
-      border-radius: 8px;
-      padding: 18px;
-    }
-
-    .indicador strong {
-      display: block;
-      font-size: 29px;
-      font-weight: normal;
-      color: var(--verde);
-    }
-
-    .indicador span {
-      display: block;
-      color: var(--suave);
-      font-size: 13px;
-      margin-top: 5px;
-    }
-
-    .filtros {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    input, select, textarea {
-      font: 14px Arial, sans-serif;
-      color: var(--texto);
-      background: var(--papel);
-      border: 1px solid var(--linha);
-      border-radius: 5px;
-      padding: 11px;
-    }
-
-    input {
-      flex: 1;
-      min-width: 0;
-    }
-
-    select {
-      max-width: 190px;
-    }
-
-    .lista {
-      display: grid;
-      gap: 14px;
-    }
-
-    .cartao {
-      background: var(--papel);
-      border: 1px solid var(--linha);
-      border-radius: 8px;
-      padding: 20px;
-    }
-
-    .topo-cartao {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .origem {
-      font-size: 16px;
-      color: var(--verde);
-      font-weight: bold;
-    }
-
-    .data {
-      color: var(--suave);
-      font: 12px Arial, sans-serif;
-      margin-top: 5px;
-    }
-
-    .comentario {
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
-      line-height: 1.6;
-      margin: 18px 0;
-      font-size: 15px;
-    }
-
-    .pagina {
-      font: 12px Arial, sans-serif;
-      color: var(--suave);
-      overflow-wrap: anywhere;
-      margin-bottom: 16px;
-    }
-
-    .pagina a {
-      color: var(--verde);
-    }
-
-    .controles {
-      border-top: 1px solid var(--linha);
-      padding-top: 15px;
-      display: grid;
-      grid-template-columns: 190px 1fr auto;
-      gap: 10px;
-      align-items: end;
-    }
-
-    .campo label {
-      display: block;
-      color: var(--suave);
-      font: 12px Arial, sans-serif;
-      margin-bottom: 6px;
-    }
-
-    .campo select,
-    .campo textarea {
-      width: 100%;
-      max-width: none;
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 42px;
-    }
-
-    button {
-      background: var(--verde);
-      color: white;
-      border: 0;
-      border-radius: 5px;
-      padding: 12px 18px;
-      cursor: pointer;
-      font-size: 13px;
-    }
-
-    button:hover {
-      opacity: .88;
-    }
-
-    .status {
-      display: inline-block;
-      padding: 5px 9px;
-      border-radius: 20px;
-      font: 11px Arial, sans-serif;
-      background: #eeeae1;
-      color: #625b4e;
-    }
-
-    .status.atendido {
-      background: #e4eee3;
-      color: #3d6441;
-    }
-
-    .status.analise {
-      background: #f5ecd9;
-      color: #896b31;
-    }
-
-    .status.arquivado {
-      background: #e9e8e5;
-      color: #68645e;
-    }
-
-    .mensagem {
-      text-align: center;
-      padding: 35px;
-      color: var(--suave);
-      background: var(--papel);
-      border: 1px solid var(--linha);
-      border-radius: 8px;
-    }
-
-    .rodape {
-      text-align: center;
-      color: var(--suave);
-      font-size: 12px;
-      margin-top: 30px;
-    }
-
-    @media (max-width: 650px) {
-      .indicadores {
-        gap: 8px;
-      }
-
-      .indicador {
-        padding: 12px;
-      }
-
-      .indicador strong {
-        font-size: 24px;
-      }
-
-      .filtros {
-        flex-direction: column;
-      }
-
-      select {
-        max-width: none;
-      }
-
-      .controles {
-        grid-template-columns: 1fr;
-      }
-
-      button {
-        width: 100%;
-      }
+    @media (max-width: 390px) {
+      .module-grid { grid-template-columns: 1fr; }
+      .welcome-seal { display: none; }
     }
   </style>
 </head>
-
 <body>
-
-<header>
-  <div class="marca">❦</div>
-  <h1>Central de Feedback</h1>
-  <p>MOSTEIRO DA SANTA CRUZ · ADMINISTRAÇÃO</p>
-</header>
-
-<main>
-
-  <section class="indicadores">
-    <div class="indicador">
-      <strong id="total">—</strong>
-      <span>Total de comentários</span>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">✥</div>
+      <div>
+        <div class="brand-name">Centralce</div>
+        <div class="brand-sub">Mosteiro da Santa Cruz</div>
+      </div>
     </div>
 
-    <div class="indicador">
-      <strong id="analise">—</strong>
-      <span>Em análise</span>
+    <div class="nav-label">Espaço de trabalho</div>
+    <nav class="nav" aria-label="Navegação principal">
+      <button class="nav-button active" data-view="inicio" onclick="abrirInicio()">
+        <span class="nav-icon">⌂</span><span class="nav-text">Visão geral</span>
+      </button>
+      <button class="nav-button" data-view="feedback" onclick="abrirModulo('feedback')">
+        <span class="nav-icon">▤</span><span class="nav-text">Feedback</span><span class="nav-tag">01</span>
+      </button>
+      <button class="nav-button" data-view="correio" onclick="abrirModulo('correio')">
+        <span class="nav-icon">✉</span><span class="nav-text">Correio</span>
+      </button>
+      <button class="nav-button" data-view="whatsapp" onclick="abrirModulo('whatsapp')">
+        <span class="nav-icon">◉</span><span class="nav-text">WhatsApp</span>
+      </button>
+      <button class="nav-button" data-view="alces" onclick="abrirModulo('alces')">
+        <span class="nav-icon">♧</span><span class="nav-text">ALCEs</span>
+      </button>
+      <button class="nav-button" data-view="administracao" onclick="abrirModulo('administracao')">
+        <span class="nav-icon">⚙</span><span class="nav-text">Administração</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-note">
+      <strong>Um só espaço de trabalho</strong>
+      Os serviços permanecem independentes, mas são acessados pela mesma interface.
     </div>
+    <div class="sidebar-footer">Central administrativa · Versão inicial</div>
+  </aside>
 
-    <div class="indicador">
-      <strong id="atendidos">—</strong>
-      <span>Atendidos</span>
-    </div>
-  </section>
+  <div class="workspace">
+    <header class="topbar">
+      <div class="crumb">Mosteiro <span aria-hidden="true"> / </span> <strong id="breadcrumb">Visão geral</strong></div>
+      <div class="topbar-right">
+        <div class="system-status"><span class="status-dot"></span> Interface conectada</div>
+        <div class="avatar" aria-label="Usuário">M</div>
+      </div>
+    </header>
 
-  <section class="filtros">
-    <input
-      id="pesquisa"
-      type="search"
-      placeholder="Pesquisar comentários, módulos ou páginas..."
-      oninput="renderizar()"
-    >
+    <main class="content">
+      <section id="inicioView">
+        <div class="page-heading">
+          <div>
+            <div class="eyebrow">Central administrativa</div>
+            <h1>Visão geral</h1>
+            <p class="lead">Acesso aos serviços e ferramentas do Mosteiro em um único espaço de trabalho.</p>
+          </div>
+          <div class="date-label">MOSTEIRO DA SANTA CRUZ</div>
+        </div>
 
-    <select id="filtro" onchange="renderizar()">
-      <option value="">Todas as situações</option>
-      <option>Recebido</option>
-      <option>Em análise</option>
-      <option>Atendido</option>
-      <option>Arquivado</option>
-    </select>
+        <section class="welcome">
+          <div class="welcome-copy">
+            <div class="welcome-kicker">Central de serviços</div>
+            <h2>Bem-vindo à Centralce</h2>
+            <p>Uma interface comum para reunir os módulos administrativos, mantendo cada serviço organizado e independente.</p>
+          </div>
+          <div class="welcome-seal" aria-hidden="true">✥</div>
+        </section>
 
-    <button onclick="carregar()">Atualizar</button>
-  </section>
+        <h2 class="section-title">Módulos</h2>
+        <div class="module-grid">
+          <button class="module-card" onclick="abrirModulo('feedback')">
+            <span class="module-top"><span class="module-icon">▤</span><span class="module-state">Disponível</span></span>
+            <strong>Feedback</strong>
+            <small>Consultar comentários, acompanhar situações e registrar observações.</small>
+          </button>
+          <button class="module-card" disabled>
+            <span class="module-top"><span class="module-icon">✉</span><span class="module-state">Em preparação</span></span>
+            <strong>Correio</strong>
+            <small>Centralização do atendimento por e-mail institucional.</small>
+          </button>
+          <button class="module-card" disabled>
+            <span class="module-top"><span class="module-icon">◉</span><span class="module-state">Em preparação</span></span>
+            <strong>WhatsApp</strong>
+            <small>Acesso ao canal de mensagens e atendimento institucional.</small>
+          </button>
+          <button class="module-card" disabled>
+            <span class="module-top"><span class="module-icon">♧</span><span class="module-state">Em preparação</span></span>
+            <strong>ALCEs</strong>
+            <small>Entrada para os assistentes e serviços especializados.</small>
+          </button>
+          <button class="module-card" disabled>
+            <span class="module-top"><span class="module-icon">⚙</span><span class="module-state">Em preparação</span></span>
+            <strong>Administração</strong>
+            <small>Configurações, usuários, permissões e integrações.</small>
+          </button>
+        </div>
+      </section>
 
-  <section id="lista" class="lista">
-    <div class="mensagem">Carregando comentários...</div>
-  </section>
+      <section id="feedbackView" class="module-view" aria-label="Módulo Feedback">
+        <div class="page-heading">
+          <div>
+            <div class="eyebrow">Módulo integrado</div>
+            <h1>Feedback</h1>
+            <p class="lead">Comentários recebidos pelos serviços e páginas do Mosteiro.</p>
+          </div>
+        </div>
+        <div class="module-toolbar">
+          <span class="crumb">O módulo é carregado dentro da Centralce.</span>
+          <button class="back-button" onclick="abrirInicio()">← Visão geral</button>
+        </div>
+        <div class="module-frame-wrap">
+          <iframe id="feedbackFrame" class="module-frame" title="Módulo de Feedback" loading="lazy"></iframe>
+        </div>
+      </section>
 
-  <div class="rodape">
-    Central de Feedback do Mosteiro
+      <section id="placeholderView" class="module-view">
+        <div class="page-heading">
+          <div>
+            <div class="eyebrow">Módulo da Centralce</div>
+            <h1 id="placeholderTitle">Módulo</h1>
+            <p class="lead" id="placeholderLead">Área reservada para integração.</p>
+          </div>
+          <button class="back-button" onclick="abrirInicio()">← Visão geral</button>
+        </div>
+        <div class="placeholder">
+          <div class="placeholder-icon" id="placeholderIcon">✥</div>
+          <h2>Este módulo está em preparação</h2>
+          <p id="placeholderDescription">A estrutura da Centralce já reserva este espaço. A integração será adicionada quando o serviço estiver pronto, sem alterar a navegação principal.</p>
+          <span class="placeholder-label">Ainda não conectado</span>
+        </div>
+      </section>
+    </main>
   </div>
-
-</main>
+</div>
 
 <script>
-  let feedbacks = [];
+  const modulos = {
+    correio: {
+      titulo: "Correio",
+      descricao: "Integração futura com o correio eletrônico institucional.",
+      icone: "✉"
+    },
+    whatsapp: {
+      titulo: "WhatsApp",
+      descricao: "Integração futura com o canal institucional de mensagens.",
+      icone: "◉"
+    },
+    alces: {
+      titulo: "ALCEs",
+      descricao: "Acesso futuro aos assistentes e serviços especializados do Mosteiro.",
+      icone: "♧"
+    },
+    administracao: {
+      titulo: "Administração",
+      descricao: "Área futura para usuários, permissões, configurações e integrações.",
+      icone: "⚙"
+    }
+  };
 
-  function carregar() {
-    document.getElementById("lista").innerHTML =
-      '<div class="mensagem">Carregando comentários...</div>';
+  let feedbackCarregado = false;
 
-    google.script.run
-      .withSuccessHandler(dados => {
-        feedbacks = dados || [];
-        atualizarIndicadores();
-        renderizar();
-      })
-      .withFailureHandler(erro => {
-        document.getElementById("lista").textContent =
-          "Não foi possível carregar os comentários: " +
-          erro.message;
-      })
-      .obterFeedbacks();
-  }
-
-  function atualizarIndicadores() {
-    document.getElementById("total").textContent =
-      feedbacks.length;
-
-    document.getElementById("analise").textContent =
-      feedbacks.filter(f => f.situacao === "Em análise").length;
-
-    document.getElementById("atendidos").textContent =
-      feedbacks.filter(f => f.situacao === "Atendido").length;
-  }
-
-  function classeSituacao(situacao) {
-    if (situacao === "Atendido") return "atendido";
-    if (situacao === "Em análise") return "analise";
-    if (situacao === "Arquivado") return "arquivado";
-    return "";
-  }
-
-  function renderizar() {
-    const termo = document.getElementById("pesquisa")
-      .value.toLowerCase();
-
-    const filtro = document.getElementById("filtro").value;
-
-    const filtrados = feedbacks.filter(f => {
-      const texto = [
-        f.origem,
-        f.pagina,
-        f.comentario,
-        f.observacoes
-      ].join(" ").toLowerCase();
-
-      return texto.includes(termo) &&
-        (!filtro || f.situacao === filtro);
+  function marcarNavegacao(view) {
+    document.querySelectorAll(".nav-button").forEach(botao => {
+      botao.classList.toggle("active", botao.dataset.view === view);
     });
+  }
 
-    const lista = document.getElementById("lista");
-    lista.replaceChildren();
+  function ocultarViews() {
+    document.getElementById("inicioView").style.display = "none";
+    document.getElementById("feedbackView").classList.remove("visible");
+    document.getElementById("placeholderView").classList.remove("visible");
+  }
 
-    if (!filtrados.length) {
-      const vazio = document.createElement("div");
-      vazio.className = "mensagem";
-      vazio.textContent = "Nenhum comentário encontrado.";
-      lista.appendChild(vazio);
+  function abrirInicio() {
+    ocultarViews();
+    document.getElementById("inicioView").style.display = "block";
+    document.getElementById("breadcrumb").textContent = "Visão geral";
+    marcarNavegacao("inicio");
+  }
+
+  function abrirModulo(nome) {
+    ocultarViews();
+    document.getElementById("breadcrumb").textContent =
+      nome === "feedback" ? "Feedback" : (modulos[nome]?.titulo || "Módulo");
+    marcarNavegacao(nome);
+
+    if (nome === "feedback") {
+      document.getElementById("feedbackView").classList.add("visible");
+      if (!feedbackCarregado) {
+        document.getElementById("feedbackFrame").src = "?module=feedback&embedded=1";
+        feedbackCarregado = true;
+      }
       return;
     }
 
-    filtrados.forEach(f => {
-      const cartao = document.createElement("article");
-      cartao.className = "cartao";
+    const modulo = modulos[nome];
+    if (!modulo) return;
 
-      const topo = document.createElement("div");
-      topo.className = "topo-cartao";
-
-      const identificacao = document.createElement("div");
-
-      const origem = document.createElement("div");
-      origem.className = "origem";
-      origem.textContent = f.origem || "Origem não identificada";
-
-      const data = document.createElement("div");
-      data.className = "data";
-      data.textContent = f.data;
-
-      identificacao.append(origem, data);
-
-      const status = document.createElement("span");
-      status.className = "status " + classeSituacao(f.situacao);
-      status.textContent = f.situacao;
-
-      topo.append(identificacao, status);
-
-      const comentario = document.createElement("div");
-      comentario.className = "comentario";
-      comentario.textContent = f.comentario;
-
-      const pagina = document.createElement("div");
-      pagina.className = "pagina";
-
-      if (f.pagina) {
-        pagina.textContent = "Página: " + f.pagina;
-      }
-
-      const controles = document.createElement("div");
-      controles.className = "controles";
-
-      const campoSituacao = document.createElement("div");
-      campoSituacao.className = "campo";
-
-      const labelSituacao = document.createElement("label");
-      labelSituacao.textContent = "Situação";
-
-      const select = document.createElement("select");
-
-      [
-        "Recebido",
-        "Em análise",
-        "Atendido",
-        "Arquivado"
-      ].forEach(opcao => {
-        const option = document.createElement("option");
-        option.value = opcao;
-        option.textContent = opcao;
-        option.selected = opcao === f.situacao;
-        select.appendChild(option);
-      });
-
-      campoSituacao.append(labelSituacao, select);
-
-      const campoObs = document.createElement("div");
-      campoObs.className = "campo";
-
-      const labelObs = document.createElement("label");
-      labelObs.textContent = "Observações internas";
-
-      const textarea = document.createElement("textarea");
-      textarea.maxLength = 2000;
-      textarea.placeholder = "Anotações administrativas...";
-      textarea.value = f.observacoes || "";
-
-      campoObs.append(labelObs, textarea);
-
-      const botao = document.createElement("button");
-      botao.textContent = "Salvar";
-      botao.onclick = () => salvar(
-        f.id,
-        select.value,
-        textarea.value,
-        botao
-      );
-
-      controles.append(campoSituacao, campoObs, botao);
-
-      cartao.append(topo, comentario);
-
-      if (f.pagina) {
-        cartao.appendChild(pagina);
-      }
-
-      cartao.appendChild(controles);
-      lista.appendChild(cartao);
-    });
+    document.getElementById("placeholderTitle").textContent = modulo.titulo;
+    document.getElementById("placeholderLead").textContent = modulo.descricao;
+    document.getElementById("placeholderDescription").textContent =
+      modulo.descricao + " A área já está prevista na interface e poderá receber um HTML independente.";
+    document.getElementById("placeholderIcon").textContent = modulo.icone;
+    document.getElementById("placeholderView").classList.add("visible");
   }
-
-  function salvar(id, situacao, observacoes, botao) {
-    botao.disabled = true;
-    botao.textContent = "Salvando...";
-
-    google.script.run
-      .withSuccessHandler(() => {
-        botao.textContent = "Salvo";
-        carregar();
-      })
-      .withFailureHandler(erro => {
-        botao.disabled = false;
-        botao.textContent = "Salvar";
-        alert("Não foi possível salvar: " + erro.message);
-      })
-      .atualizarFeedback(id, situacao, observacoes);
-  }
-
-  carregar();
 </script>
-
 </body>
 </html>
