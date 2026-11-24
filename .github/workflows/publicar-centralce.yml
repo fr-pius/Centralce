@@ -1,0 +1,91 @@
+name: Publicar Centralce
+
+on:
+  workflow_dispatch:
+    inputs:
+      descricao:
+        description: "Descrição desta versão"
+        required: true
+        default: "Publicação autorizada pelo responsável"
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: centralce-apps-script-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Instalar clasp
+        run: npm install --global @google/clasp
+
+      - name: Configurar autenticação e projeto
+        env:
+          CLASPRC_JSON_B64: ${{ secrets.CLASPRC_JSON_B64 }}
+        run: |
+          test -n "$CLASPRC_JSON_B64" || { echo "O segredo CLASPRC_JSON_B64 não foi configurado."; exit 1; }
+          printf '%s' "$CLASPRC_JSON_B64" | base64 --decode > "$HOME/.clasprc.json"
+          node -e "JSON.parse(require('fs').readFileSync(process.env.HOME+'/.clasprc.json','utf8')); console.log('Credenciais JSON válidas.')"
+          printf '%s\\n' '{"scriptId":"1Y5eVLT4bwdY77sF8Cwe59ynwvTxoTc0LLFaSKkJQw_mL7Qp-gCmoAXSu","rootDir":"."}' > .clasp.json
+          node -e "const c=JSON.parse(require('fs').readFileSync('.clasp.json','utf8')); if(c.scriptId!=='1Y5eVLT4bwdY77sF8Cwe59ynwvTxoTc0LLFaSKkJQw_mL7Qp-gCmoAXSu') process.exit(1); console.log('Configuração .clasp.json válida.')"
+
+      - name: Confirmar sincronização automática bem-sucedida
+        uses: actions/github-script@v7
+        with:
+          script: |
+            if (context.ref !== "refs/heads/main") {
+              core.setFailed("A publicação só pode ser executada a partir da branch main.");
+              return;
+            }
+
+            const workflow = ".github/workflows/sincronizar-apps-script.yml";
+            const sha = context.sha;
+            const deadline = Date.now() + 10 * 60 * 1000;
+
+            while (Date.now() < deadline) {
+              const response = await github.rest.actions.listWorkflowRuns({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: workflow,
+                branch: "main",
+                per_page: 100
+              });
+
+              const run = response.data.workflow_runs.find(item =>
+                item.head_sha === sha && item.event === "push"
+              );
+
+              if (run?.status === "completed") {
+                if (run.conclusion === "success") {
+                  core.info(`Sincronização confirmada: ${sha}`);
+                  return;
+                }
+                core.setFailed(`A sincronização automática terminou com resultado: ${run.conclusion}`);
+                return;
+              }
+
+              core.info("Aguardando a sincronização automática correspondente a este commit...");
+              await new Promise(resolve => setTimeout(resolve, 15000));
+            }
+
+            core.setFailed("Não foi possível confirmar a sincronização automática bem-sucedida em até 10 minutos.");
+
+      - name: Atualizar implantação existente
+        env:
+          DESCRICAO: ${{ inputs.descricao }}
+          DEPLOYMENT_ID: "AKfycbwWTR1nEPrEHvjxFgkRZh3fGpdgltIHOvshwMxiN6teeqqDJ1VRhqYJe3oFRonDZ_E"
+        run: clasp update-deployment "$DEPLOYMENT_ID" --description "$DESCRICAO"
