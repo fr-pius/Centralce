@@ -40,7 +40,7 @@ jobs:
           test -n "$CLASPRC_JSON_B64" || { echo "O segredo CLASPRC_JSON_B64 não foi configurado."; exit 1; }
           printf '%s' "$CLASPRC_JSON_B64" | base64 --decode > "$HOME/.clasprc.json"
           node -e "JSON.parse(require('fs').readFileSync(process.env.HOME+'/.clasprc.json','utf8')); console.log('Credenciais JSON válidas.')"
-          printf '%s\\n' '{"scriptId":"1Y5eVLT4bwdY77sF8Cwe59ynwvTxoTc0LLFaSKkJQw_mL7Qp-gCmoAXSu","rootDir":"."}' > .clasp.json
+          printf '%s\n' '{"scriptId":"1Y5eVLT4bwdY77sF8Cwe59ynwvTxoTc0LLFaSKkJQw_mL7Qp-gCmoAXSu","rootDir":"."}' > .clasp.json
           node -e "const c=JSON.parse(require('fs').readFileSync('.clasp.json','utf8')); if(c.scriptId!=='1Y5eVLT4bwdY77sF8Cwe59ynwvTxoTc0LLFaSKkJQw_mL7Qp-gCmoAXSu') process.exit(1); console.log('Configuração .clasp.json válida.')"
 
       - name: Confirmar sincronização automática bem-sucedida
