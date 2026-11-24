@@ -1,0 +1,41 @@
+name: Sincronizar Centralce com Apps Script
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: centralce-apps-script-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Instalar clasp
+        run: npm install --global @google/clasp
+
+      - name: Configurar autenticação e projeto
+        env:
+          CLASPRC_JSON_B64: ${{ secrets.CLASPRC_JSON_B64 }}
+        run: |
+          test -n "$CLASPRC_JSON_B64" || { echo "O segredo CLASPRC_JSON_B64 não foi configurado."; exit 1; }
+          mkdir -p "$HOME"
+          printf '%s' "$CLASPRC_JSON_B64" | base64 --decode > "$HOME/.clasprc.json"
+          node -e "JSON.parse(require('fs').readFileSync(process.env.HOME+'/.clasprc.json','utf8')); console.log('Credenciais JSON válidas.')"
+          printf '{"scriptId":"1Y5eVLT4bwdY77sF8Cwe59ynwvTxoTc0LLFaSKkJQw_mL7Qp-gCmoAXSu","rootDir":"."}\n' > .clasp.json
+
+      - name: Enviar código ao Apps Script (sem publicar)
+        run: clasp push --force
