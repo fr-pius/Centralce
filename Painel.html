@@ -1,0 +1,521 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    :root {
+      --fundo: #f5f2eb;
+      --papel: #fffefa;
+      --texto: #302e29;
+      --suave: #77736b;
+      --linha: #e5e0d6;
+      --verde: #465b49;
+      --verde-claro: #e8eee7;
+      --ouro: #a18450;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--fundo);
+      color: var(--texto);
+      font-family: Georgia, serif;
+    }
+
+    header {
+      background: var(--papel);
+      border-bottom: 1px solid var(--linha);
+      padding: 30px 24px 24px;
+      text-align: center;
+    }
+
+    header .marca {
+      color: var(--ouro);
+      font-size: 27px;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      font-size: 27px;
+      font-weight: normal;
+      margin: 0;
+    }
+
+    header p {
+      color: var(--suave);
+      font-size: 11px;
+      letter-spacing: 2px;
+      margin: 10px 0 0;
+    }
+
+    main {
+      width: min(1050px, calc(100% - 32px));
+      margin: 30px auto 60px;
+    }
+
+    .indicadores {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 25px;
+    }
+
+    .indicador {
+      background: var(--papel);
+      border: 1px solid var(--linha);
+      border-radius: 8px;
+      padding: 18px;
+    }
+
+    .indicador strong {
+      display: block;
+      font-size: 29px;
+      font-weight: normal;
+      color: var(--verde);
+    }
+
+    .indicador span {
+      display: block;
+      color: var(--suave);
+      font-size: 13px;
+      margin-top: 5px;
+    }
+
+    .filtros {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    input, select, textarea {
+      font: 14px Arial, sans-serif;
+      color: var(--texto);
+      background: var(--papel);
+      border: 1px solid var(--linha);
+      border-radius: 5px;
+      padding: 11px;
+    }
+
+    input {
+      flex: 1;
+      min-width: 0;
+    }
+
+    select {
+      max-width: 190px;
+    }
+
+    .lista {
+      display: grid;
+      gap: 14px;
+    }
+
+    .cartao {
+      background: var(--papel);
+      border: 1px solid var(--linha);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .topo-cartao {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .origem {
+      font-size: 16px;
+      color: var(--verde);
+      font-weight: bold;
+    }
+
+    .data {
+      color: var(--suave);
+      font: 12px Arial, sans-serif;
+      margin-top: 5px;
+    }
+
+    .comentario {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      line-height: 1.6;
+      margin: 18px 0;
+      font-size: 15px;
+    }
+
+    .pagina {
+      font: 12px Arial, sans-serif;
+      color: var(--suave);
+      overflow-wrap: anywhere;
+      margin-bottom: 16px;
+    }
+
+    .pagina a {
+      color: var(--verde);
+    }
+
+    .controles {
+      border-top: 1px solid var(--linha);
+      padding-top: 15px;
+      display: grid;
+      grid-template-columns: 190px 1fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .campo label {
+      display: block;
+      color: var(--suave);
+      font: 12px Arial, sans-serif;
+      margin-bottom: 6px;
+    }
+
+    .campo select,
+    .campo textarea {
+      width: 100%;
+      max-width: none;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 42px;
+    }
+
+    button {
+      background: var(--verde);
+      color: white;
+      border: 0;
+      border-radius: 5px;
+      padding: 12px 18px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    button:hover {
+      opacity: .88;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 20px;
+      font: 11px Arial, sans-serif;
+      background: #eeeae1;
+      color: #625b4e;
+    }
+
+    .status.atendido {
+      background: #e4eee3;
+      color: #3d6441;
+    }
+
+    .status.analise {
+      background: #f5ecd9;
+      color: #896b31;
+    }
+
+    .status.arquivado {
+      background: #e9e8e5;
+      color: #68645e;
+    }
+
+    .mensagem {
+      text-align: center;
+      padding: 35px;
+      color: var(--suave);
+      background: var(--papel);
+      border: 1px solid var(--linha);
+      border-radius: 8px;
+    }
+
+    .rodape {
+      text-align: center;
+      color: var(--suave);
+      font-size: 12px;
+      margin-top: 30px;
+    }
+
+    @media (max-width: 650px) {
+      .indicadores {
+        gap: 8px;
+      }
+
+      .indicador {
+        padding: 12px;
+      }
+
+      .indicador strong {
+        font-size: 24px;
+      }
+
+      .filtros {
+        flex-direction: column;
+      }
+
+      select {
+        max-width: none;
+      }
+
+      .controles {
+        grid-template-columns: 1fr;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="marca">❦</div>
+  <h1>Central de Feedback</h1>
+  <p>MOSTEIRO DA SANTA CRUZ · ADMINISTRAÇÃO</p>
+</header>
+
+<main>
+
+  <section class="indicadores">
+    <div class="indicador">
+      <strong id="total">—</strong>
+      <span>Total de comentários</span>
+    </div>
+
+    <div class="indicador">
+      <strong id="analise">—</strong>
+      <span>Em análise</span>
+    </div>
+
+    <div class="indicador">
+      <strong id="atendidos">—</strong>
+      <span>Atendidos</span>
+    </div>
+  </section>
+
+  <section class="filtros">
+    <input
+      id="pesquisa"
+      type="search"
+      placeholder="Pesquisar comentários, módulos ou páginas..."
+      oninput="renderizar()"
+    >
+
+    <select id="filtro" onchange="renderizar()">
+      <option value="">Todas as situações</option>
+      <option>Recebido</option>
+      <option>Em análise</option>
+      <option>Atendido</option>
+      <option>Arquivado</option>
+    </select>
+
+    <button onclick="carregar()">Atualizar</button>
+  </section>
+
+  <section id="lista" class="lista">
+    <div class="mensagem">Carregando comentários...</div>
+  </section>
+
+  <div class="rodape">
+    Central de Feedback do Mosteiro
+  </div>
+
+</main>
+
+<script>
+  let feedbacks = [];
+
+  function carregar() {
+    document.getElementById("lista").innerHTML =
+      '<div class="mensagem">Carregando comentários...</div>';
+
+    google.script.run
+      .withSuccessHandler(dados => {
+        feedbacks = dados || [];
+        atualizarIndicadores();
+        renderizar();
+      })
+      .withFailureHandler(erro => {
+        document.getElementById("lista").textContent =
+          "Não foi possível carregar os comentários: " +
+          erro.message;
+      })
+      .obterFeedbacks();
+  }
+
+  function atualizarIndicadores() {
+    document.getElementById("total").textContent =
+      feedbacks.length;
+
+    document.getElementById("analise").textContent =
+      feedbacks.filter(f => f.situacao === "Em análise").length;
+
+    document.getElementById("atendidos").textContent =
+      feedbacks.filter(f => f.situacao === "Atendido").length;
+  }
+
+  function classeSituacao(situacao) {
+    if (situacao === "Atendido") return "atendido";
+    if (situacao === "Em análise") return "analise";
+    if (situacao === "Arquivado") return "arquivado";
+    return "";
+  }
+
+  function renderizar() {
+    const termo = document.getElementById("pesquisa")
+      .value.toLowerCase();
+
+    const filtro = document.getElementById("filtro").value;
+
+    const filtrados = feedbacks.filter(f => {
+      const texto = [
+        f.origem,
+        f.pagina,
+        f.comentario,
+        f.observacoes
+      ].join(" ").toLowerCase();
+
+      return texto.includes(termo) &&
+        (!filtro || f.situacao === filtro);
+    });
+
+    const lista = document.getElementById("lista");
+    lista.replaceChildren();
+
+    if (!filtrados.length) {
+      const vazio = document.createElement("div");
+      vazio.className = "mensagem";
+      vazio.textContent = "Nenhum comentário encontrado.";
+      lista.appendChild(vazio);
+      return;
+    }
+
+    filtrados.forEach(f => {
+      const cartao = document.createElement("article");
+      cartao.className = "cartao";
+
+      const topo = document.createElement("div");
+      topo.className = "topo-cartao";
+
+      const identificacao = document.createElement("div");
+
+      const origem = document.createElement("div");
+      origem.className = "origem";
+      origem.textContent = f.origem || "Origem não identificada";
+
+      const data = document.createElement("div");
+      data.className = "data";
+      data.textContent = f.data;
+
+      identificacao.append(origem, data);
+
+      const status = document.createElement("span");
+      status.className = "status " + classeSituacao(f.situacao);
+      status.textContent = f.situacao;
+
+      topo.append(identificacao, status);
+
+      const comentario = document.createElement("div");
+      comentario.className = "comentario";
+      comentario.textContent = f.comentario;
+
+      const pagina = document.createElement("div");
+      pagina.className = "pagina";
+
+      if (f.pagina) {
+        pagina.textContent = "Página: " + f.pagina;
+      }
+
+      const controles = document.createElement("div");
+      controles.className = "controles";
+
+      const campoSituacao = document.createElement("div");
+      campoSituacao.className = "campo";
+
+      const labelSituacao = document.createElement("label");
+      labelSituacao.textContent = "Situação";
+
+      const select = document.createElement("select");
+
+      [
+        "Recebido",
+        "Em análise",
+        "Atendido",
+        "Arquivado"
+      ].forEach(opcao => {
+        const option = document.createElement("option");
+        option.value = opcao;
+        option.textContent = opcao;
+        option.selected = opcao === f.situacao;
+        select.appendChild(option);
+      });
+
+      campoSituacao.append(labelSituacao, select);
+
+      const campoObs = document.createElement("div");
+      campoObs.className = "campo";
+
+      const labelObs = document.createElement("label");
+      labelObs.textContent = "Observações internas";
+
+      const textarea = document.createElement("textarea");
+      textarea.maxLength = 2000;
+      textarea.placeholder = "Anotações administrativas...";
+      textarea.value = f.observacoes || "";
+
+      campoObs.append(labelObs, textarea);
+
+      const botao = document.createElement("button");
+      botao.textContent = "Salvar";
+      botao.onclick = () => salvar(
+        f.id,
+        select.value,
+        textarea.value,
+        botao
+      );
+
+      controles.append(campoSituacao, campoObs, botao);
+
+      cartao.append(topo, comentario);
+
+      if (f.pagina) {
+        cartao.appendChild(pagina);
+      }
+
+      cartao.appendChild(controles);
+      lista.appendChild(cartao);
+    });
+  }
+
+  function salvar(id, situacao, observacoes, botao) {
+    botao.disabled = true;
+    botao.textContent = "Salvando...";
+
+    google.script.run
+      .withSuccessHandler(() => {
+        botao.textContent = "Salvo";
+        carregar();
+      })
+      .withFailureHandler(erro => {
+        botao.disabled = false;
+        botao.textContent = "Salvar";
+        alert("Não foi possível salvar: " + erro.message);
+      })
+      .atualizarFeedback(id, situacao, observacoes);
+  }
+
+  carregar();
+</script>
+
+</body>
+</html>
