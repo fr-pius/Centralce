@@ -13,10 +13,22 @@ const ABA_FEEDBACK = "Feedback_Central";
  * "Somente eu".
  */
 
-function doGet() {
+function doGet(e) {
+  const modulo = e && e.parameter ? e.parameter.module : "";
+
+  // O módulo é servido separadamente para ser incorporado
+  // na área de trabalho da interface principal.
+  if (modulo === "feedback") {
+    return HtmlService
+      .createHtmlOutputFromFile("Feedback")
+      .setTitle("Feedback · Centralce")
+      .addMetaTag("viewport", "width=device-width, initial-scale=1")
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  }
+
   return HtmlService
     .createHtmlOutputFromFile("Painel")
-    .setTitle("Central de Feedback")
+    .setTitle("Centralce · Mosteiro da Santa Cruz")
     .addMetaTag("viewport", "width=device-width, initial-scale=1");
 }
 
