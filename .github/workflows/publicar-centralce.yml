@@ -37,10 +37,11 @@ jobs:
         env:
           CLASPRC_JSON_B64: ${{ secrets.CLASPRC_JSON_B64 }}
         run: |
+          set -euo pipefail
           test -n "$CLASPRC_JSON_B64" || { echo "O segredo CLASPRC_JSON_B64 não foi configurado."; exit 1; }
           printf '%s' "$CLASPRC_JSON_B64" | base64 --decode > "$HOME/.clasprc.json"
           node -e "JSON.parse(require('fs').readFileSync(process.env.HOME+'/.clasprc.json','utf8')); console.log('Credenciais JSON válidas.')"
-          printf '%s\n' '{"scriptId":"1Y5eVLT4bwdY77sF8Cwe59ynwvTxoTc0LLFaSKkJQw_mL7Qp-gCmoAXSu","rootDir":"."}' > .clasp.json
+          printf '%s\\n' '{"scriptId":"1Y5eVLT4bwdY77sF8Cwe59ynwvTxoTc0LLFaSKkJQw_mL7Qp-gCmoAXSu","rootDir":"."}' > .clasp.json
           node -e "const c=JSON.parse(require('fs').readFileSync('.clasp.json','utf8')); if(c.scriptId!=='1Y5eVLT4bwdY77sF8Cwe59ynwvTxoTc0LLFaSKkJQw_mL7Qp-gCmoAXSu') process.exit(1); console.log('Configuração .clasp.json válida.')"
 
       - name: Confirmar sincronização automática bem-sucedida
@@ -88,4 +89,16 @@ jobs:
         env:
           DESCRICAO: ${{ inputs.descricao }}
           DEPLOYMENT_ID: "AKfycbwWTR1nEPrEHvjxFgkRZh3fGpdgltIHOvshwMxiN6teeqqDJ1VRhqYJe3oFRonDZ_E"
-        run: clasp update-deployment "$DEPLOYMENT_ID" --description "$DESCRICAO"
+        run: |
+          set -euo pipefail
+          echo "Atualizando implantação $DEPLOYMENT_ID..."
+          RESPOSTA="$(clasp update-deployment "$DEPLOYMENT_ID" --description "$DESCRICAO" 2>&1)" || {
+            printf '%s\\n' "$RESPOSTA"
+            exit 1
+          }
+          printf '%s\\n' "$RESPOSTA"
+          if printf '%s' "$RESPOSTA" | grep -Eiq '"error"[[:space:]]*:|invalid_grant|invalid_rapt|unauthorized|forbidden'; then
+            echo "A API do Google retornou uma falha; a publicação não será considerada concluída."
+            exit 1
+          fi
+          echo "Comando de atualização concluído sem erros reportados."
