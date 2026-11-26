@@ -27,8 +27,7 @@
     html, body { margin: 0; min-height: 100%; }
     body { background: var(--page); color: var(--ink); }
     button { font: inherit; }
-    .app { min-height: 100vh; display: grid; grid-template-columns: 256px minmax(0, 1fr); }
-    .app.sidebar-collapsed { grid-template-columns: 0 minmax(0, 1fr); }
+    .app { min-height: 100vh; display: flex; width: 100%; }
     .app.sidebar-collapsed .sidebar { display: none; }
 
     .sidebar-toggle {
@@ -43,6 +42,7 @@
     .app.sidebar-collapsed .sidebar-toggle { left: 14px; }
 
     .sidebar {
+      flex: 0 0 256px; width: 256px;
       position: sticky; top: 0; height: 100vh; min-height: 560px;
       display: flex; flex-direction: column; padding: 25px 17px 18px;
       color: #f3f6f1; background: var(--forest);
@@ -75,7 +75,7 @@
     .sidebar-note strong { display: block; margin-bottom: 4px; color: #f0e6cf; font-size: 11px; }
     .sidebar-footer { padding: 18px 10px 0; color: #8fa497; font-size: 10px; }
 
-    .workspace { min-width: 0; min-height: 100vh; display: flex; flex-direction: column; }
+    .workspace { flex: 1 1 0; width: 0; min-width: 0; min-height: 100vh; display: flex; flex-direction: column; }
     .workspace.alces-mode { height: 100vh; min-height: 0; overflow: hidden; }
     .workspace.alces-mode .topbar { display: none; }
     .workspace.alces-mode .content {
@@ -151,14 +151,15 @@
     .placeholder-label { display: inline-block; margin-top: 19px; padding: 6px 10px; border-radius: 20px; color: #806b3f; background: #f5f0e4; font-size: 10px; }
 
     @media (max-width: 1050px) {
-      .app { grid-template-columns: 220px minmax(0, 1fr); }
+      .sidebar { flex-basis: 220px; width: 220px; }
       .sidebar-toggle { left: 234px; }
       .module-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .content { padding: 27px 24px; }
       .topbar { padding: 0 24px; }
     }
     @media (max-width: 720px) {
-      .app { display: block; }
+      .app { display: block; width: 100%; }
+      .sidebar { width: auto; }
       .app.sidebar-collapsed .sidebar { display: none; }
       .sidebar-toggle, .app.sidebar-collapsed .sidebar-toggle { top: 10px; left: 12px; }
       .sidebar { position: relative; z-index: 5; height: auto; min-height: 0; padding: 12px 13px 10px; }
@@ -184,6 +185,7 @@
       .module-frame-wrap { height: calc(100vh - 205px); min-height: 470px; }
       .module-view { min-height: calc(100vh - 100px); }
       .workspace.alces-mode { height: calc(100vh - 104px); }
+      .app.sidebar-collapsed .workspace.alces-mode { height: 100vh; }
       .workspace.alces-mode .content { height: 100%; }
       .workspace.alces-mode #alcesView { height: 100%; }
       .system-status { display: none; }
