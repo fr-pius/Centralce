@@ -28,6 +28,19 @@
     body { background: var(--page); color: var(--ink); }
     button { font: inherit; }
     .app { min-height: 100vh; display: grid; grid-template-columns: 256px minmax(0, 1fr); }
+    .app.sidebar-collapsed { grid-template-columns: 0 minmax(0, 1fr); }
+    .app.sidebar-collapsed .sidebar { display: none; }
+
+    .sidebar-toggle {
+      position: fixed; z-index: 30; top: 14px; left: 270px;
+      width: 38px; height: 38px; display: grid; place-items: center;
+      border: 1px solid var(--line); border-radius: 9px;
+      color: var(--forest); background: #fff; box-shadow: 0 2px 9px rgba(22,50,39,.10);
+      font-size: 19px; line-height: 1; cursor: pointer;
+      transition: left .2s ease, background .16s ease, color .16s ease;
+    }
+    .sidebar-toggle:hover { color: #fff; background: var(--forest-2); }
+    .app.sidebar-collapsed .sidebar-toggle { left: 14px; }
 
     .sidebar {
       position: sticky; top: 0; height: 100vh; min-height: 560px;
@@ -139,13 +152,17 @@
 
     @media (max-width: 1050px) {
       .app { grid-template-columns: 220px minmax(0, 1fr); }
+      .sidebar-toggle { left: 234px; }
       .module-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .content { padding: 27px 24px; }
       .topbar { padding: 0 24px; }
     }
     @media (max-width: 720px) {
       .app { display: block; }
+      .app.sidebar-collapsed .sidebar { display: none; }
+      .sidebar-toggle, .app.sidebar-collapsed .sidebar-toggle { top: 10px; left: 12px; }
       .sidebar { position: relative; z-index: 5; height: auto; min-height: 0; padding: 12px 13px 10px; }
+      .brand { padding-left: 47px; }
       .brand { padding: 0 5px 11px; }
       .brand-mark { width: 34px; height: 34px; font-size: 21px; }
       .brand-name { font-size: 18px; }
@@ -178,8 +195,18 @@
   </style>
 </head>
 <body>
-<div class="app">
-  <aside class="sidebar">
+<div class="app" id="centralceApp">
+  <button
+    class="sidebar-toggle"
+    id="sidebarToggle"
+    type="button"
+    aria-label="Ocultar menu lateral"
+    aria-controls="centralceSidebar"
+    aria-expanded="true"
+    title="Ocultar ou mostrar menu lateral"
+    onclick="alternarMenuLateral()"
+  >☰</button>
+  <aside class="sidebar" id="centralceSidebar">
     <div class="brand">
       <div class="brand-mark">✥</div>
       <div>
@@ -352,6 +379,19 @@
   };
 
   let feedbackCarregado = false;
+
+  function alternarMenuLateral() {
+    const app = document.getElementById("centralceApp");
+    const botao = document.getElementById("sidebarToggle");
+    const oculto = app.classList.toggle("sidebar-collapsed");
+
+    botao.setAttribute("aria-expanded", String(!oculto));
+    botao.setAttribute(
+      "aria-label",
+      oculto ? "Mostrar menu lateral" : "Ocultar menu lateral"
+    );
+    botao.title = oculto ? "Mostrar menu lateral" : "Ocultar menu lateral";
+  }
 
   function marcarNavegacao(view) {
     document.querySelectorAll(".nav-button").forEach(botao => {
